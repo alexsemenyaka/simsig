@@ -1,7 +1,7 @@
 [project]
 name = "simsig"
 version = "0.1.0"
-description = "simsig: a simple but powerful thread-safe, and async-aware signal handling framework for Python."
+description = "simsig: a simple but powerful thread-safe, and async-aware signal handling framework for Python"
 authors = [
     { name = "Alex Semenyaka", email = "alex.semenyaka@gmail.com" },
 ]
@@ -16,9 +16,9 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
-#[project.urls]
-#Homepage = ""
-#Repository = ""
+[project.urls]
+Homepage = "https://pypi.org/project/simsig/"
+Repository = "https://github.com/alexsemenyaka/simsig"
 #Issues = ""
 
 [build-system]
