@@ -26,7 +26,7 @@ To run the tests locally, first set up a development environment.
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/your_username/simsig.git](https://github.com/your_username/simsig.git)
+    git clone [https://github.com/alexsemenyaka/simsig.git](https://github.com/alexsemenyaka/simsig.git)
     cd simsig
     ```
 

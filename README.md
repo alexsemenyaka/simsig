@@ -1,8 +1,8 @@
 # simsig: A Simple and Powerful Signal Handling Framework
 
-[![Build Status](https://img.shields.io/travis/com/your_username/simsig.svg?style=for-the-badge)](https://travis-ci.com/your_username/simsig)
+[![Build Status](https://img.shields.io/travis/com/alexsemenyaka/simsig.svg?style=for-the-badge)](https://travis-ci.com/alexsemenyaka/simsig)
 [![PyPI version](https://img.shields.io/pypi/v/simsig.svg?style=for-the-badge)](https://pypi.org/project/simsig/)
-[![Coverage Status](https://img.shields.io/coveralls/github/your_username/simsig.svg?style=for-the-badge)](https://coveralls.io/github/your_username/simsig)
+[![Coverage Status](https://img.shields.io/coveralls/github/alexsemenyaka/simsig.svg?style=for-the-badge)](https://coveralls.io/github/alexsemenyaka/simsig)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
 `simsig` is a Python library that provides a high-level, intuitive, and powerful interface for handling OS signals. It's built on top of Python's standard `signal` module but abstracts away its complexities and limitations, making it easy to write robust, signal-aware applications.
@@ -27,7 +27,7 @@ pip install simsig
 ```
 For developers, you can install it in editable mode from a local clone:
 ```bash
-git clone https://github.com/your_username/simsig.git
+git clone https://github.com/alexsemenyaka/simsig.git
 cd simsig
 pip install -e .
 ```

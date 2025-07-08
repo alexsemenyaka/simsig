@@ -1,12 +1,20 @@
 # byte code
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+
+#virt env
+.venv/
+venv/
+env/
 
 # macOS junk
 .DS_Store
 
 # Test coverage files
 .coverage
+.pytest_cache/
 htmlcov/
 
 # Python package metadata and such
@@ -15,6 +23,6 @@ dist/
 build/
 
 # evident
-.venv/
 tmp/
 *.log
+*.swp
