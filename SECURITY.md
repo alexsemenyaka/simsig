@@ -12,4 +12,4 @@ It is a young project. All public versions are supported.
 
 ## Reporting a Vulnerability
 
-Well-commented pull-request are welcome. As an option, you can send your reports to: alex.semenyaka@gmail.com.
+Well-commented pull-requests are welcome. As an option, you can send your reports to: alex.semenyaka@gmail.com.
