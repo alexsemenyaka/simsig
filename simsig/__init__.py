@@ -1,19 +1,15 @@
 """
-simsig: a simple but powerful thread-safe, and async-aware signal handling framework for Python.
+simsig: a simple but powerful thread-safe, and async-aware
+signal handling framework for Python.
 """
 
 import importlib.metadata
 
-from .simsig import (
-    # Core classes and exceptions
-    SimSig, SigReaction, Signals, SimSigTimeoutError,
-
-    # Functional API wrappers
-    set_handler, graceful_shutdown, chain_handler, ignore_terminal_signals, reset_to_defaults, async_handler, get_signal_setting, has_sig,
-
-    # Context manager wrappers
-    temp_handler, with_timeout, block_signals
-)
+from .simsig import (  
+    Signals, SigReaction, SimSig, SimSigTimeoutError, async_handler,
+    block_signals, chain_handler, get_signal_setting, graceful_shutdown,
+    has_sig, ignore_terminal_signals, reset_to_defaults, set_handler,
+    temp_handler, with_timeout)
 
 _metadata = importlib.metadata.metadata("simsig")
 __version__ = _metadata["Version"]
@@ -35,5 +31,5 @@ __all__ = [
     "has_sig",
     "temp_handler",
     "with_timeout",
-    "block_signals"
+    "block_signals",
 ]

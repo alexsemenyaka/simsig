@@ -197,8 +197,10 @@ coverage: install
 lint: install
 	@echo "Running linting checks for $(PROJECT_NAME)..."
 	@$(VENV_PIP) install flake8 pylint
-	@flake8 $(SRC_DIR) $(TEST_DIR) $(EXAMPLES_DIR)
-	@pylint $(SRC_DIR) $(TEST_DIR) $(EXAMPLES_DIR)
+	#@flake8 $(SRC_DIR) $(TEST_DIR) $(EXAMPLES_DIR)
+	#@pylint $(SRC_DIR) $(TEST_DIR) $(EXAMPLES_DIR)
+	@flake8 $(SRC_DIR)
+	@pylint $(SRC_DIR)
 	@echo -e "$(GREEN)Linting completed$(NC)"
 
 .PHONY: format

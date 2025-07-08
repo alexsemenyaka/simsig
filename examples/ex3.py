@@ -1,24 +1,28 @@
 #!/usr/bin/env python3
 
-import simsig
-import time
 import os
 import sys
+import time
+
+import simsig
 
 # Check if the module can run on this OS.
 if sys.platform == "win32":
     print("This minimal example is designed for UNIX-like systems and will now exit")
     sys.exit(0)
 
+
 # Define a minimal exit function.
 def on_exit():
     # Exit the process immediately, without cleanup.
     os._exit(0)
 
+
 # Define an empty handler for status checks.
 def show_status(signal_number, frame):
     # Do nothing, just catch the signal.
     pass
+
 
 # All terminating signals (including Ctrl+C) will now exit silently.
 simsig.graceful_shutdown(on_exit)
