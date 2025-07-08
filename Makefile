@@ -76,7 +76,8 @@ help:
 	@echo "  devmode          - Install the package in the development mode"
 	@echo "  test             - Run all tests with pytest"
 	@echo "  test-integration - Run integration tests (requires SSH server on localhost:2222)"
-	@echo "  test-final       - Run corner cases tests"
+	@echo "  test-unit        - Run unit tests"
+	@echo "  test-asyncio     - Run asyncio signal handling tests"
 	@echo "  coverage         - Run tests with coverage report"
 	@echo "  lint             - Run linting checks (flake8, pylint)"
 	@echo "  format           - Run code formatting (black, isort)"
@@ -94,7 +95,7 @@ help:
 	@echo ""
 	@echo "Examples:"
 	@echo "  make all           # Run all checks and build"
-	@echo "  make test-tcp      # Run TCP tests"
+	@echo "  make test-unit     # Run unit tests"
 	@echo "  make lint          # Run linting checks"
 	@echo "  make docs          # Validate documentation"
 	@echo "  make publish       # Build and publish to PyPI"
@@ -134,7 +135,7 @@ install: venv
 
 .PHONY: devmode
 devmode: venv
-	@$(VENV_PIP) install -e .
+	$(VENV_PIP) install -e .
 
 # Run all tests
 .PHONY: test
@@ -149,25 +150,34 @@ test: install
 	fi
 
 # Selective test targets
-.PHONY: test-integration test-final
-test-final: install
+.PHONY: test-integration test-unit test-asyncio
+test-unit: install
 	@echo "Running corner cases tests for $(PROJECT_NAME)..."
-	@if [ -f $(TEST_DIR)/test_final.py ]; then \
-		$(VENV_PYTHON) -m pytest $(TEST_DIR)/test_final.py -v; \
-		echo -e "$(GREEN)Corner cases tests completed$(NC)"; \
+	@if [ -f $(TEST_DIR)/test_simsig.py ]; then \
+		$(VENV_PYTHON) -m pytest -m unit $(TEST_DIR)/test_simsig.py -v; \
+		echo -e "$(GREEN)Unit tests completed$(NC)"; \
 	else \
-		echo -e "$(RED)No corner cases tests found in $(TEST_DIR)/test_final.py$(NC)"; \
+		echo -e "$(RED)No tests found in $(TEST_DIR)/$(NC)"; \
 		exit 1; \
 	fi
 
 test-integration: install
 	@echo "Running integration tests for $(PROJECT_NAME)..."
-	@echo "Ensure SSH server is running on localhost:2222 (see TESTING.md)"
-	@if [ -f $(TEST_DIR)/test_integration.py ]; then \
-		$(VENV_PYTHON) -m pytest $(TEST_DIR)/test_integration.py -v; \
+	@if [ -f $(TEST_DIR)/test_simsig.py ]; then \
+		$(VENV_PYTHON) -m pytest -m integration $(TEST_DIR)/test_simsig.py -v; \
 		echo -e "$(GREEN)Integration tests completed$(NC)"; \
 	else \
-		echo -e "$(RED)No integration tests found in $(TEST_DIR)/test_integration.py$(NC)"; \
+		echo -e "$(RED)No tests found in $(TEST_DIR)/$(NC)"; \
+		exit 1; \
+	fi
+
+test-asyncio: install
+	@echo "Running asyncio tests for $(PROJECT_NAME)..."
+	@if [ -f $(TEST_DIR)/test_simsig.py ]; then \
+		$(VENV_PYTHON) -m pytest -m asyncio $(TEST_DIR)/test_simsig.py -v; \
+		echo -e "$(GREEN)Asyncio tests completed$(NC)"; \
+	else \
+		echo -e "$(RED)No tests found in $(TEST_DIR)/$(NC)"; \
 		exit 1; \
 	fi
 

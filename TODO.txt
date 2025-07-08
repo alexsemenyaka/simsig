@@ -1,12 +1,17 @@
-To do:
 make venv
+source .venv/bin/activate
+
 make install
 make devmode
 
 Edit pyproject.toml
 Edit Makefile along with the development process
+Edit <module>/__init__.py (add the module description!)
 
 Remember of:
   .bumpversion.cfg
   .coveragerc
   .gitignore
+
+After using the virtual env, type:
+deactivate

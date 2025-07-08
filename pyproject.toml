@@ -1,7 +1,7 @@
 [project]
 name = "simsig"
 version = "0.1.0"
-description = ""
+description = "simsig: a simple but powerful thread-safe, and async-aware signal handling framework for Python."
 authors = [
     { name = "Alex Semenyaka", email = "alex.semenyaka@gmail.com" },
 ]
@@ -9,7 +9,7 @@ dependencies = []
 readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "MIT" }
-keywords = []
+keywords = ["signals", ]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
