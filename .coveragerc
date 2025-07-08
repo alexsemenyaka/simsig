@@ -1,0 +1,8 @@
+[run]
+source = simsig
+branch = True
+omit = 
+    tests/*.py
+
+[report]
+show_missing = True

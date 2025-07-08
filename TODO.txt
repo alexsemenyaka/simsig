@@ -1,0 +1,12 @@
+To do:
+make venv
+make install
+make devmode
+
+Edit pyproject.toml
+Edit Makefile along with the development process
+
+Remember of:
+  .bumpversion.cfg
+  .coveragerc
+  .gitignore
