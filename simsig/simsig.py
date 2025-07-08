@@ -149,7 +149,7 @@ class SimSig:
     def chain_handler(
         self, sig: Union[Signals, int], callback: Callable, order: str = "before"
     ):
-        """🔗 Adds a new callback to an existing signal handler chain"""
+        """Adds a new callback to an existing signal handler chain"""
         if order not in ["before", "after"]:
             raise ValueError("Order must be 'before' or 'after'")
 
@@ -199,7 +199,7 @@ class SimSig:
             self.set_handler(signals_to_ignore, SigReaction.IGN)
 
     def reset_to_defaults(self):
-        """🔄 Resets all catchable signal handlers to the OS default (SIG_DFL)"""
+        """Resets all catchable signal handlers to the OS default (SIG_DFL)"""
         logger.info("Resetting all possible signal handlers to default")
         for sig in Signals:
             try:
@@ -238,7 +238,7 @@ class SimSig:
 
     @contextmanager
     def with_timeout(self, seconds: int):
-        """⏳ Context manager to run a block of code with a timeout (UNIX-only)"""
+        """Context manager to run a block of code with a timeout (UNIX-only)"""
         if not hasattr(signal, "SIGALRM"):
             raise NotImplementedError("Timeout via SIGALRM is not supported on this OS")
 
@@ -289,7 +289,7 @@ class SimSig:
         signals: Union[Signals, int, List[Union[Signals, int]]],
         callback: Callable[..., Any],
     ):
-        """⚡ Registers a callback for use in an asyncio event loop"""
+        """Registers a callback for use in an asyncio event loop"""
         try:
             loop = asyncio.get_running_loop()
         except RuntimeError as e:

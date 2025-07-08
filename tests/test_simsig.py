@@ -199,7 +199,7 @@ def test_async_handler_outside_loop(clean_simsig):
     """Covers the RuntimeError when async_handler is called outside a running loop."""
     with pytest.raises(
         RuntimeError,
-        match="can only be called from within a running asyncio event loop",
+        match="async_handler is to be called from within a running asyncio event loop",
     ):
         simsig.async_handler(simsig.Signals.SIGUSR1, lambda: None)
 
