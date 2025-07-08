@@ -31,7 +31,7 @@ simsig.graceful_shutdown(on_exit)
 simsig.set_handler(simsig.Signals.SIGINFO, show_status)
 
 # Temporarily ignore Ctrl+C for 10 seconds.
-with simsig.temp_handler(simsig.Signals.SIGINT, simsig.SigReaction.ign):
+with simsig.temp_handler(simsig.Signals.SIGINT, simsig.SigReaction.IGN):
     time.sleep(10)
 
 # Run a block that will be terminated by a timeout after 2 seconds.

@@ -18,7 +18,7 @@ def main():
 
     print("\n--- Testing temp_handler ---")
     print("Entering a 5-second critical section where Ctrl+C will be ignored.")
-    with simsig.temp_handler(simsig.Signals.SIGINT, simsig.SigReaction.ign):
+    with simsig.temp_handler(simsig.Signals.SIGINT, simsig.SigReaction.IGN):
         for i in range(5, 0, -1):
             print(
                 f"Critical section... {i}s remaining. Try pressing Ctrl+C (it should be ignored)."

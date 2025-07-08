@@ -37,7 +37,7 @@ def clean_simsig(monkeypatch):
 @pytest.mark.unit
 def test_set_handler_ign(clean_simsig):
     """Tests setting a handler to be ignored."""
-    simsig.set_handler(simsig.Signals.SIGUSR1, simsig.SigReaction.ign)
+    simsig.set_handler(simsig.Signals.SIGUSR1, simsig.SigReaction.IGN)
     assert signal.getsignal(simsig.Signals.SIGUSR1) == signal.SIG_IGN
 
 
@@ -47,7 +47,7 @@ def test_set_handler_dfl(clean_simsig):
     # First, set it to something else
     signal.signal(simsig.Signals.SIGUSR1, signal.SIG_IGN)
     # Now, test the reset functionality
-    simsig.set_handler(simsig.Signals.SIGUSR1, simsig.SigReaction.dflt)
+    simsig.set_handler(simsig.Signals.SIGUSR1, simsig.SigReaction.DFLT)
     assert signal.getsignal(simsig.Signals.SIGUSR1) == signal.SIG_DFL
 
 
@@ -104,7 +104,7 @@ def test_graceful_shutdown_callback(clean_simsig, mocker):
 def test_temp_handler_restores_original(clean_simsig):
     """Tests that temp_handler restores the original handler."""
     original_handler = signal.getsignal(simsig.Signals.SIGUSR2)
-    with simsig.temp_handler(simsig.Signals.SIGUSR2, simsig.SigReaction.ign):
+    with simsig.temp_handler(simsig.Signals.SIGUSR2, simsig.SigReaction.IGN):
         assert signal.getsignal(simsig.Signals.SIGUSR2) == signal.SIG_IGN
     assert signal.getsignal(simsig.Signals.SIGUSR2) == original_handler
 
@@ -210,7 +210,7 @@ def test_fin_reaction_without_graceful_callback(clean_simsig, mocker):
     mock_exit = mocker.patch("sys.exit", side_effect=SystemExit)
     assert clean_simsig._graceful_shutdown_callback is None  # Verify precondition
 
-    simsig.set_handler(simsig.Signals.SIGUSR2, simsig.SigReaction.fin)
+    simsig.set_handler(simsig.Signals.SIGUSR2, simsig.SigReaction.FIN)
 
     with pytest.raises(SystemExit):
         os.kill(os.getpid(), simsig.Signals.SIGUSR2)
@@ -223,11 +223,11 @@ def test_fin_reaction_without_graceful_callback(clean_simsig, mocker):
 def test_fin_handler_is_reused(clean_simsig):
     """Covers the caching logic of _create_fin_handler."""
     # First call creates the handler
-    simsig.set_handler(simsig.Signals.SIGUSR1, simsig.SigReaction.fin)
+    simsig.set_handler(simsig.Signals.SIGUSR1, simsig.SigReaction.FIN)
     handler1 = signal.getsignal(simsig.Signals.SIGUSR1)
 
     # Second call should reuse the same handler object
-    simsig.set_handler(simsig.Signals.SIGUSR2, simsig.SigReaction.fin)
+    simsig.set_handler(simsig.Signals.SIGUSR2, simsig.SigReaction.FIN)
     handler2 = signal.getsignal(simsig.Signals.SIGUSR2)
 
     assert callable(handler1)
@@ -266,7 +266,7 @@ def test_temp_handler_with_uncatchable_signal(clean_simsig):
     # signal like SIGKILL doesn't raise an exception.
     original_handler = signal.getsignal(signal.SIGKILL)
     try:
-        with simsig.temp_handler(signal.SIGKILL, simsig.SigReaction.ign):
+        with simsig.temp_handler(signal.SIGKILL, simsig.SigReaction.IGN):
             pass  # The context manager should suppress the OSError on exit
     except OSError:
         pytest.fail("temp_handler did not suppress OSError for uncatchable signal.")
@@ -328,7 +328,7 @@ def test_temp_handler_suppresses_restore_error(clean_simsig, mocker):
 
     # We expect the context manager to suppress this error and exit cleanly
     try:
-        with simsig.temp_handler(simsig.Signals.SIGUSR1, simsig.SigReaction.ign):
+        with simsig.temp_handler(simsig.Signals.SIGUSR1, simsig.SigReaction.IGN):
             # The first call to set the handler will be mocked, but that's fine.
             # We are testing the exit part of the context manager.
             pass

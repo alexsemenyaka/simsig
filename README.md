@@ -163,7 +163,7 @@ The library exposes both a class-based and a functional API.
 * **Classes**:
     * `SimSig`: The main class for handling signals in an object-oriented way.
     * `Signals`: An `IntEnum` containing all signals available on the current OS.
-    * `SigReaction`: An `IntEnum` for high-level actions (`dflt`, `ign`, `fin`).
+    * `SigReaction`: An `IntEnum` for high-level actions (`DFLT`, `IGN`, `fin`).
     * `SimSigTimeoutError`: Custom exception for timeouts.
 * **Functions**:
     * `set_handler`, `graceful_shutdown`, `chain_handler`, `ignore_terminal_signals`, `reset_to_defaults`, `async_handler`, `get_signal_setting`, `has_sig`.
