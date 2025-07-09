@@ -18,6 +18,7 @@
 * **Handler Chaining:** Add new behavior to existing signal handlers without overwriting them.
 * **Asyncio Integration:** A dedicated, safe method for handling signals within an `asyncio` event loop.
 * **Cross-Platform:** Provides a consistent interface and gracefully handles differences between operating systems (e.g., UNIX vs. Windows).
+    * Windows support is fairly limited though at the moment
 
 ## Installation
 
