@@ -17,6 +17,9 @@ env/
 .pytest_cache/
 htmlcov/
 
+# secrets
+coverall-env.sh
+
 # Python package metadata and such
 *.egg-info/
 dist/
