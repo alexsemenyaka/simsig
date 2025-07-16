@@ -176,7 +176,6 @@ The library exposes both a class-based and a functional API.
             * `order`:    string 'before' or 'after' specifing where to put a new handler in the chain
         * `ignore_terminal_signals()`: start ignoring all signals related to the controlling terminal
         * `reset_to_defaults()`: resets all catchable signal handlers to the OS default (`SIG_DFL`)
-        * `reset_to_defaults()`: resets all catchable signal handlers to the OS default (`SIG_DFL`)
         * `async_handler(sigs, callback)`: registers a callback for use in an asyncio event loop
             * `sigs`:     a signal number, a `Signals` object, or a list/tuple consisting of them (you may mix numbers and `Signal` objs)
             * `callback`: a `callable` object (a callback) to be called when one of `sigs` is delivered
