@@ -1,6 +1,6 @@
 [project]
 name = "simsig"
-version = "1.0.5"
+version = "2.0.0"
 description = "simsig: a simple but powerful thread-safe, and async-aware signal handling framework for Python"
 authors = [
     { name = "Alex Semenyaka", email = "alex.semenyaka@gmail.com" },
