@@ -1,5 +1,4 @@
 """
-
 `simsig` is a Python library that provides a high-level, intuitive, and
 powerful interface for handling OS signals. It's built on top of
 Python's standard `signal` module but abstracts away its complexities and limitations,
@@ -7,10 +6,11 @@ making it easy to write robust, signal-aware applications.
 
 """
 
-import asyncio
-import logging
-import signal
 import sys
+import signal
+import asyncio
+import threading
+import logging
 from contextlib import contextmanager
 from enum import IntEnum
 from typing import Any, Callable, Dict, List, Tuple, Optional, Set, Union
@@ -45,6 +45,7 @@ class SimSig:
     """A class providing a powerful and intuitive interface for signal management"""
 
     def __init__(self):
+        self._lock = threading.RLock()
         self._graceful_shutdown_callback: Optional[Callable] = None
         self._fin_handler: Optional[Callable] = None
 
@@ -86,20 +87,20 @@ class SimSig:
 
     def _create_fin_handler(self) -> Callable:
         """Creates and caches a generic termination handler"""
-        if self._fin_handler is None:
-            logger.debug("Creating a new 'fin' handler")
+        with self._lock:
+            if self._fin_handler is None:
+                logger.debug("Creating a new 'fin' handler")
 
-            def handler(signum, _frame):
-                sig_name = Signals(signum).name
-                logger.warning(
-                    "Received terminating signal %s: initiating shutdown", sig_name
-                )
-                if self._graceful_shutdown_callback:
-                    logger.info("Executing graceful shutdown callback")
-                    self._graceful_shutdown_callback()
-                sys.exit(128 + signum)
+                def handler(signum, _frame):
+                    sig_name = Signals(signum).name
+                    logger.warning("Received terminating signal %s: initiating shutdown", sig_name)
 
-            self._fin_handler = handler
+                    if self._graceful_shutdown_callback:
+                        logger.info("Executing graceful shutdown callback")
+                        self._graceful_shutdown_callback()
+                    sys.exit(128 + signum)
+
+                self._fin_handler = handler
         return self._fin_handler
 
     def set_handler(
@@ -108,73 +109,74 @@ class SimSig:
         reaction: Union[SigReaction, Callable],
     ):
         """Sets a handler for one or more signals"""
-        signal_list = self._normalize_signals(signals)
-        handler_to_set: Any = None
+        with self._lock:
+            signal_list = self._normalize_signals(signals)
+            handler_to_set: Any = None
 
-        if isinstance(reaction, SigReaction):
-            reaction_map = {
-                SigReaction.DFLT: signal.SIG_DFL,
-                SigReaction.IGN: signal.SIG_IGN,
-                SigReaction.FIN: self._create_fin_handler(),
-            }
-            handler_to_set = reaction_map.get(reaction)
-        elif callable(reaction):
-            handler_to_set = reaction
-        else:
-            raise TypeError("handler must be a SigReaction enum or a callable")
+            if isinstance(reaction, SigReaction):
+                reaction_map = {
+                    SigReaction.DFLT: signal.SIG_DFL,
+                    SigReaction.IGN: signal.SIG_IGN,
+                    SigReaction.FIN: self._create_fin_handler(),
+                }
+                handler_to_set = reaction_map.get(reaction)
+            elif callable(reaction):
+                handler_to_set = reaction
+            else:
+                raise TypeError("handler must be a SigReaction enum or a callable")
 
-        for sig in signal_list:
-            sig_name = Signals(sig).name
-            reaction_name = (
-                reaction.name
-                if isinstance(reaction, SigReaction)
-                else getattr(reaction, "__name__", str(reaction))
-            )
-            logger.info("Setting handler for %s to %s", sig_name, reaction_name)
-            try:
-                signal.signal(sig, handler_to_set)
-            except (ValueError, OSError) as e:
-                logger.warning("Could not set handler for %s: %s", sig_name, e)
+            for sig in signal_list:
+                sig_name = Signals(sig).name
+                reaction_name = (
+                    reaction.name
+                    if isinstance(reaction, SigReaction)
+                    else getattr(reaction, "__name__", str(reaction))
+                )
+                logger.info("Setting handler for %s to %s", sig_name, reaction_name)
+                try:
+                    signal.signal(sig, handler_to_set)
+                except (ValueError, OSError) as e:
+                    logger.warning("Could not set handler for %s: %s", sig_name, e)
 
     def graceful_shutdown(self, callback: Callable):
         """Sets a specific callback for all typical terminating signals"""
         if not callable(callback):
             raise TypeError("Provided callback must be a callable function")
         logger.info("Registering '%s' for graceful shutdown", callback.__name__)
-        self._graceful_shutdown_callback = callback
+        with self._lock:
+            self._graceful_shutdown_callback = callback
 
-        signals_to_set = [
-            s for s in self._terminating_by_default if s.name != "SIGKILL"
-        ]
-        self.set_handler(signals_to_set, SigReaction.FIN)
+            signals_to_set = [s for s in self._terminating_by_default if s.name != "SIGKILL"]
+            self.set_handler(signals_to_set, SigReaction.FIN)
 
     def chain_handler(
         self, sig: Union[Signals, int], callback: Callable, order: str = "before"
     ):
         """Adds a new callback to an existing signal handler chain"""
-        if order not in ["before", "after"]:
-            raise ValueError("Order must be 'before' or 'after'")
+        with self._lock:
+            if order not in ["before", "after"]:
+                raise ValueError("Order must be 'before' or 'after'")
 
-        original_handler = self.get_signal_setting(sig)
-        sig_name = Signals(sig).name
-        logger.info(
-            "Chaining callback '%s' to %s handler (order: %s)",
-            callback.__name__,
-            sig_name,
-            order,
-        )
+            original_handler = self.get_signal_setting(sig)
+            sig_name = Signals(sig).name
+            logger.info(
+                "Chaining callback '%s' to %s handler (order: %s)",
+                callback.__name__,
+                sig_name,
+                order,
+            )
 
-        def chained_handler(signum, frame):
-            if order == "before":
-                callback(signum, frame)
-                if callable(original_handler):
-                    original_handler(signum, frame)
-            else:  # after
-                if callable(original_handler):
-                    original_handler(signum, frame)
-                callback(signum, frame)
+            def chained_handler(signum, frame):
+                if order == "before":
+                    callback(signum, frame)
+                    if callable(original_handler):
+                        original_handler(signum, frame)
+                else:  # == "after"
+                    if callable(original_handler):
+                        original_handler(signum, frame)
+                    callback(signum, frame)
 
-        self.set_handler(sig, chained_handler)
+            self.set_handler(sig, chained_handler)
 
     # --- Utility & Context Managers ---
 
@@ -194,23 +196,23 @@ class SimSig:
             if name in Signals.__members__
         ]
         if signals_to_ignore:
-            logger.info(
-                "Ignoring terminal signals: %s",
-                ", ".join([Signals(s).name for s in signals_to_ignore]),
-            )
-            self.set_handler(signals_to_ignore, SigReaction.IGN)
+            with self._lock:
+                logger.info(
+                    "Ignoring terminal signals: %s",
+                    ", ".join([Signals(s).name for s in signals_to_ignore]),
+                )
+                self.set_handler(signals_to_ignore, SigReaction.IGN)
 
     def reset_to_defaults(self):
         """Resets all catchable signal handlers to the OS default (SIG_DFL)"""
         logger.info("Resetting all possible signal handlers to default")
-        for sig in Signals:
-            try:
-                self.set_handler(sig, SigReaction.DFLT)
-            except (OSError, ValueError, RuntimeError):
-                logger.debug(
-                    "Could not reset %s, signal is likely uncatchable", sig.name
-                )
-                continue
+        with self._lock:
+            for sig in Signals:
+                try:
+                    self.set_handler(sig, SigReaction.DFLT)
+                except (OSError, ValueError, RuntimeError):
+                    logger.debug("Could not reset %s, signal is likely uncatchable", sig.name)
+                    continue
 
     @contextmanager
     def temp_handler(
@@ -220,23 +222,24 @@ class SimSig:
     ):
         """Temporarily seting a handler, restoring the old one on exit"""
         signal_list = self._normalize_signals(sigs)
-        original_handlers = {sig: self.get_signal_setting(sig) for sig in signal_list}
+        with self._lock:
+            original_handlers = {sig: self.get_signal_setting(sig) for sig in signal_list}
 
-        logger.debug(
-            "Entering temp_handler context for signals %s",
-            ", ".join([Signals(_).name for _ in signal_list]),
-        )
-        try:
-            self.set_handler(signal_list, reaction)
-            yield
-        finally:
-            logger.debug("Exiting temp_handler context, restoring original handlers")
-            for sig, handler in original_handlers.items():
-                if handler is not None:
-                    try:
-                        signal.signal(sig, handler)
-                    except (ValueError, OSError):
-                        pass  # Suppressing errors if an uncatchable signal
+            logger.debug(
+                "Entering temp_handler context for signals %s",
+                ", ".join([Signals(_).name for _ in signal_list]),
+            )
+            try:
+                self.set_handler(signal_list, reaction)
+                yield
+            finally:
+                logger.debug("Exiting temp_handler context, restoring original handlers")
+                for sig, handler in original_handlers.items():
+                    if handler is not None:
+                        try:
+                            signal.signal(sig, handler)
+                        except (ValueError, OSError):
+                            pass  # Suppressing errors if an uncatchable signal
 
     @contextmanager
     def with_timeout(self, seconds: int):
@@ -250,16 +253,18 @@ class SimSig:
             )
 
         logger.debug("Entering with_timeout context for %ds", seconds)
-        original_handler = self.get_signal_setting(Signals.SIGALRM)
-        signal.signal(Signals.SIGALRM, _timeout_handler)
-        signal.alarm(seconds)
 
-        try:
-            yield
-        finally:
-            signal.alarm(0)
-            signal.signal(Signals.SIGALRM, original_handler)
-            logger.debug("Exiting with_timeout context")
+        with self._lock:
+            original_handler = self.get_signal_setting(Signals.SIGALRM)
+            signal.signal(Signals.SIGALRM, _timeout_handler)
+            signal.alarm(seconds)
+
+            try:
+                yield
+            finally:
+                signal.alarm(0)
+                signal.signal(Signals.SIGALRM, original_handler)
+                logger.debug("Exiting with_timeout context")
 
     @contextmanager
     def block_signals(self, sigs: Union[Signals, int, List[Union[Signals, int]]]):
@@ -316,15 +321,18 @@ class SimSig:
         return signal.getsignal(int(sig))
 
     @staticmethod
-    def has_sig(sig_id: Union[str, int]) -> bool:
-        """Checks if a signal exists on the current system by its name or number"""
+    def has_sig(sig_id: Union[str, int, Any]) -> bool:
+        """
+        Checks if a signal exists on the current system by its name or number
+        If sig_id is not int or str, it will be converted to str using str()
+        """
         if isinstance(sig_id, str):
             return sig_id in Signals.__members__
         if isinstance(sig_id, int):
             try:
                 Signals(sig_id)  # If succeeds, the signal number exists.
                 return True
-            except TypeError:
+            except ValueError:
                 return False
         try:
             return str(sig_id)  in Signals.__members__
@@ -397,6 +405,6 @@ def block_signals(signals: Union[Signals, int, List[Union[Signals, int]]]):
     return _default_instance.block_signals(signals)
 
 
-def has_sig(sig_identifier: Union[str, int]) -> bool:
+def has_sig(sig_identifier: Union[str, int, Any]) -> bool:
     """Functional wrapper for SimSig.has_sig"""
     return SimSig.has_sig(sig_identifier)

@@ -190,7 +190,7 @@ The library exposes both a class-based and a functional API.
         * `reaction`: a `SigReaction` object or `callable` object (a callback), it defines how to treat `sigs`
     * `with_timeout(seconds)`: context manager to run a block of code with a timeout (UNIX-only)
         * `seconds`:  timeout to wait until SIGALRM will be sent
-    * `block_signals(isigs)`: context manager to temporarily block signals from being delivered (UNIX-only); they are going to be delivered after the leaving the covered block of code
+    * `block_signals(sigs)`: context manager to temporarily block signals from being delivered (UNIX-only); they are going to be delivered after the leaving the covered block of code
         * `sigs`:     a signal number, a `Signals` object, or a list/tuple consisting of them (you may mix numbers and `Signal` objs)
 * **Functions** strictly correnpond to the SimSig class methods with the same names
     * `set_handler(sigs, reaction)`
