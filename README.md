@@ -162,33 +162,30 @@ if __name__ == "__main__":
 The library exposes both a class-based and a functional API.
 
 * **Classes**:
-    * `Signals`:
-        An `IntEnum` containing all signals available on the current OS
-    * `SigReaction`:
-        An `IntEnum` for high-level actions: `DFLT` for the deault action, `IGN` to ignore a signal, `fin` - to run the shutdown handler
-    * `SimSig`:
-        The main class for handling signals in an object-oriented way, no parameters for `__init__`
+    * `Signals`: an `IntEnum` containing all signals available on the current OS
+    * `SigReaction`: an `IntEnum` for high-level actions: `DFLT` for the deault action, `IGN` to ignore a signal, `fin` - to run the shutdown handler
+    * `SimSig`: the main class for handling signals in an object-oriented way, no parameters for `__init__`
         * `set_handler(sigs, reaction)`: sets a handler for one or more signals
-            `sigs`:     a signal number, a `Signals` object, or a list/tuple consisting of them (you may mix numbers and `Signal` objs)
-            `reaction`: a `SigReaction` object or `callable` object (a callback), it defines how to treat `sigs`
+            * `sigs`:     a signal number, a `Signals` object, or a list/tuple consisting of them (you may mix numbers and `Signal` objs)
+            * `reaction`: a `SigReaction` object or `callable` object (a callback), it defines how to treat `sigs`
         * `graceful_shutdown(callback)`: sets a specific callback for all typical terminating signals
-            `callback`: a `callable` object to be called when terminated signal is delivered
+            * `callback`: a `callable` object to be called when terminated signal is delivered
         * `chain_handler(sig, callback, order)`: adds a new callback to an existing signal handler chain
-            `sig`:      a signal number or a `Signals` object
-            `callback`: a `callable` object to be added to the signal handler chain
-            `order`:    string 'before' or 'after' specifing where to put a new handler in the chain
+            * `sig`:      a signal number or a `Signals` object
+            * `callback`: a `callable` object to be added to the signal handler chain
+            * `order`:    string 'before' or 'after' specifing where to put a new handler in the chain
         * `ignore_terminal_signals()`: start ignoring all signals related to the controlling terminal
         * `reset_to_defaults()`: resets all catchable signal handlers to the OS default (`SIG_DFL`)
         * `reset_to_defaults()`: resets all catchable signal handlers to the OS default (`SIG_DFL`)
         * `async_handler(sigs, callback)`: registers a callback for use in an asyncio event loop
-            `sigs`:     a signal number, a `Signals` object, or a list/tuple consisting of them (you may mix numbers and `Signal` objs)
-            `callback`: a `callable` object (a callback) to be called when one of `sigs` is delivered
+            * `sigs`:     a signal number, a `Signals` object, or a list/tuple consisting of them (you may mix numbers and `Signal` objs)
+            * `callback`: a `callable` object (a callback) to be called when one of `sigs` is delivered
         * `get_signal_setting(sig)`: returns the current handler for a given signal
-            `sig`:      a signal number or a `Signals` object
+            * `sig`:      a signal number or a `Signals` object
         * `has_sig(sig_id)`: checks if a signal exists on the current system by its name or number, returns True or False
-            `sig_id`:    a signal number or signal name (like 'SIGTERM'). If another type is provided, `sig_id` will be converted to str first
+            * `sig_id`:    a signal number or signal name (like 'SIGTERM'). If another type is provided, `sig_id` will be converted to str first
     * `SimSigTimeoutError(message)`: custom **exception** for timeouts
-            `message`:   (optional) a custom message to store inside the exception object, the defaul is `'SIGALRM'` (so for \*NIX systems `has_sig(SimSigTimeoutError())==True`)
+            * `message`:   (optional) a custom message to store inside the exception object, the defaul is `'SIGALRM'` (so for \*NIX systems `has_sig(SimSigTimeoutError())==True`)
 * **Functions** strictly correnpond to the SimSig class methods with the same names
     * `set_handler(sigs, reaction)`
     * `graceful_shutdown(callback)`
@@ -200,12 +197,12 @@ The library exposes both a class-based and a functional API.
     * `has_sig(sig_id)`.
 * **Context Managers**:
     * `temp_handler(sigs, reaction)`: temporarily seting a handler, restoring the old one on exit
-            `sigs`:     a signal number, a `Signals` object, or a list/tuple consisting of them (you may mix numbers and `Signal` objs)
-            `reaction`: a `SigReaction` object or `callable` object (a callback), it defines how to treat `sigs`
+            * `sigs`:     a signal number, a `Signals` object, or a list/tuple consisting of them (you may mix numbers and `Signal` objs)
+            * `reaction`: a `SigReaction` object or `callable` object (a callback), it defines how to treat `sigs`
     * `with_timeout(seconds)`: context manager to run a block of code with a timeout (UNIX-only)
-            `seconds`:  timeout to wait until SIGALRM will be sent
+            * `seconds`:  timeout to wait until SIGALRM will be sent
     * `block_signals(isigs)`: context manager to temporarily block signals from being delivered (UNIX-only); they are going to be delivered after the leaving the covered block of code
-            `sigs`:     a signal number, a `Signals` object, or a list/tuple consisting of them (you may mix numbers and `Signal` objs)
+            * `sigs`:     a signal number, a `Signals` object, or a list/tuple consisting of them (you may mix numbers and `Signal` objs)
 
 For detailed information on each function's parameters, please refer to the docstrings within the source code.
 
