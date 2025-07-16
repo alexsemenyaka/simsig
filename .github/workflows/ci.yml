@@ -23,7 +23,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-i       pip install pytest
+        pip install pytest
         pip install -e ".[test]"
 
     - name: Run tests with coverage
