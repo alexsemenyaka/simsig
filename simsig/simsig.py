@@ -328,7 +328,7 @@ class SimSig:
                 return False
         try:
             str_sig_id = str(sig_id)
-            return sig_identifier in Signals.__members__
+            return sig_id in Signals.__members__
         except:
             return False
 
