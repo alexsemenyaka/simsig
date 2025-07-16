@@ -1,6 +1,5 @@
 # simsig: A Simple and Powerful Signal Handling Framework
 
-[![Build Status](https://img.shields.io/travis/com/alexsemenyaka/simsig.svg?style=for-the-badge)](https://travis-ci.com/alexsemenyaka/simsig)
 [![PyPI version](https://img.shields.io/pypi/v/simsig.svg?style=for-the-badge)](https://pypi.org/project/simsig/)
 [![Coverage Status](https://img.shields.io/coveralls/github/alexsemenyaka/simsig.svg?style=for-the-badge)](https://coveralls.io/github/alexsemenyaka/simsig)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
