@@ -327,8 +327,7 @@ class SimSig:
             except TypeError:
                 return False
         try:
-            str_sig_id = str(sig_id)
-            return sig_id in Signals.__members__
+            return str(sig_id)  in Signals.__members__
         except:
             return False
 
