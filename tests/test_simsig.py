@@ -188,6 +188,12 @@ def test_chain_handler_invalid_order(clean_simsig):
 
 
 @pytest.mark.unit
+def test_has_sig(clean_simsig):
+    """Covers the final return True in has_sig for the obligatory UNIX signal SIGHUP(1)"""
+    assert simsig.has_sig('SIGHUP')
+    assert simsig.has_sig(1)
+
+@pytest.mark.unit
 def test_has_sig_invalid_type(clean_simsig):
     """Covers the final return False in has_sig for invalid identifier types."""
     assert not simsig.has_sig(None)

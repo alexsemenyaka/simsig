@@ -13,7 +13,7 @@ import signal
 import sys
 from contextlib import contextmanager
 from enum import IntEnum
-from typing import Any, Callable, Dict, List, Optional, Set, Union
+from typing import Any, Callable, Dict, List, Tuple, Optional, Set, Union
 
 # Set up a dedicated logger for this module
 logger = logging.getLogger("simsig")
@@ -37,7 +37,9 @@ class SigReaction(IntEnum):
 
 class SimSigTimeoutError(TimeoutError):
     """Custom exception raised by the with_timeout context manager"""
-
+    def __init__(self, message='SIGALRM'):
+        self.message = message
+        super().__init__(message)
 
 class SimSig:
     """A class providing a powerful and intuitive interface for signal management"""
@@ -102,7 +104,7 @@ class SimSig:
 
     def set_handler(
         self,
-        signals: Union[Signals, int, List[Union[Signals, int]]],
+        signals: Union[Signals, int, List[Union[Signals, int]], Tuple[Union[Signals, int]]],
         reaction: Union[SigReaction, Callable],
     ):
         """Sets a handler for one or more signals"""
@@ -177,7 +179,7 @@ class SimSig:
     # --- Utility & Context Managers ---
 
     def ignore_terminal_signals(self):
-        """Ignores all signals related to the controlling terminal"""
+        """Start ignoring all signals related to the controlling terminal"""
         terminal_signal_names = [
             "SIGHUP",
             "SIGINT",
@@ -213,11 +215,11 @@ class SimSig:
     @contextmanager
     def temp_handler(
         self,
-        signals: Union[Signals, int, List[Union[Signals, int]]],
+        sigs: Union[Signals, int, List[Union[Signals, int]]],
         reaction: Union[SigReaction, Callable],
     ):
         """Temporarily seting a handler, restoring the old one on exit"""
-        signal_list = self._normalize_signals(signals)
+        signal_list = self._normalize_signals(sigs)
         original_handlers = {sig: self.get_signal_setting(sig) for sig in signal_list}
 
         logger.debug(
@@ -260,7 +262,7 @@ class SimSig:
             logger.debug("Exiting with_timeout context")
 
     @contextmanager
-    def block_signals(self, signals: Union[Signals, int, List[Union[Signals, int]]]):
+    def block_signals(self, sigs: Union[Signals, int, List[Union[Signals, int]]]):
         """
         Context manager to temporarily block signals from being delivered
         (UNIX-only)
@@ -270,7 +272,7 @@ class SimSig:
                 "Signal masking (pthread_sigmask) is not supported on this OS"
             )
 
-        signal_list = self._normalize_signals(signals)
+        signal_list = self._normalize_signals(sigs)
         logger.debug(
             "Blocking signals: %s", ", ".join([Signals(_).name for _ in signal_list])
         )
@@ -286,7 +288,7 @@ class SimSig:
 
     def async_handler(
         self,
-        signals: Union[Signals, int, List[Union[Signals, int]]],
+        sigs: Union[Signals, int, List[Union[Signals, int]]],
         callback: Callable[..., Any],
     ):
         """Registers a callback for use in an asyncio event loop"""
@@ -297,7 +299,7 @@ class SimSig:
                 "async_handler is to be called from within a running asyncio event loop"
             ) from e
 
-        signal_list = self._normalize_signals(signals)
+        signal_list = self._normalize_signals(sigs)
 
         for sig in signal_list:
             logger.info(
@@ -314,17 +316,21 @@ class SimSig:
         return signal.getsignal(int(sig))
 
     @staticmethod
-    def has_sig(sig_identifier: Union[str, int]) -> bool:
+    def has_sig(sig_id: Union[str, int]) -> bool:
         """Checks if a signal exists on the current system by its name or number"""
-        if isinstance(sig_identifier, str):
-            return sig_identifier in Signals.__members__
-        if isinstance(sig_identifier, int):
+        if isinstance(sig_id, str):
+            return sig_id in Signals.__members__
+        if isinstance(sig_id, int):
             try:
-                Signals(sig_identifier)  # If succeeds, the signal number exists.
+                Signals(sig_id)  # If succeeds, the signal number exists.
                 return True
-            except ValueError:
+            except TypeError:
                 return False
-        return False
+        try:
+            str_sig_id = str(sig_id)
+            return sig_identifier in Signals.__members__
+        except:
+            return False
 
 
 # For lazy people, a default instance of SimSig is created.

@@ -162,23 +162,52 @@ if __name__ == "__main__":
 The library exposes both a class-based and a functional API.
 
 * **Classes**:
-    * `SimSig`: The main class for handling signals in an object-oriented way.
-    * `Signals`: An `IntEnum` containing all signals available on the current OS.
-    * `SigReaction`: An `IntEnum` for high-level actions (`DFLT`, `IGN`, `fin`).
-    * `SimSigTimeoutError`: Custom exception for timeouts.
-* **Functions**:
-    * `set_handler`, `graceful_shutdown`, `chain_handler`, `ignore_terminal_signals`, `reset_to_defaults`, `async_handler`, `get_signal_setting`, `has_sig`.
+    * `Signals`:
+        An `IntEnum` containing all signals available on the current OS
+    * `SigReaction`:
+        An `IntEnum` for high-level actions: `DFLT` for the deault action, `IGN` to ignore a signal, `fin` - to run the shutdown handler
+    * `SimSig`:
+        The main class for handling signals in an object-oriented way, no parameters for `__init__`
+        * `set_handler(sigs, reaction)`: sets a handler for one or more signals
+            `sigs`:     a signal number, a `Signals` object, or a list/tuple consisting of them (you may mix numbers and `Signal` objs)
+            `reaction`: a `SigReaction` object or `callable` object (a callback), it defines how to treat `sigs`
+        * `graceful_shutdown(callback)`: sets a specific callback for all typical terminating signals
+            `callback`: a `callable` object to be called when terminated signal is delivered
+        * `chain_handler(sig, callback, order)`: adds a new callback to an existing signal handler chain
+            `sig`:      a signal number or a `Signals` object
+            `callback`: a `callable` object to be added to the signal handler chain
+            `order`:    string 'before' or 'after' specifing where to put a new handler in the chain
+        * `ignore_terminal_signals()`: start ignoring all signals related to the controlling terminal
+        * `reset_to_defaults()`: resets all catchable signal handlers to the OS default (`SIG_DFL`)
+        * `reset_to_defaults()`: resets all catchable signal handlers to the OS default (`SIG_DFL`)
+        * `async_handler(sigs, callback)`: registers a callback for use in an asyncio event loop
+            `sigs`:     a signal number, a `Signals` object, or a list/tuple consisting of them (you may mix numbers and `Signal` objs)
+            `callback`: a `callable` object (a callback) to be called when one of `sigs` is delivered
+        * `get_signal_setting(sig)`: returns the current handler for a given signal
+            `sig`:      a signal number or a `Signals` object
+        * `has_sig(sig_id)`: checks if a signal exists on the current system by its name or number, returns True or False
+            `sig_id`:    a signal number or signal name (like 'SIGTERM'). If another type is provided, `sig_id` will be converted to str first
+    * `SimSigTimeoutError(message)`: custom **exception** for timeouts
+            `message`:   (optional) a custom message to store inside the exception object, the defaul is `'SIGALRM'` (so for \*NIX systems `has_sig(SimSigTimeoutError())==True`)
+* **Functions** strictly correnpond to the SimSig class methods with the same names
+    * `set_handler(sigs, reaction)`
+    * `graceful_shutdown(callback)`
+    * `chain_handler(sig, callback, order)`
+    * `ignore_terminal_signals()`
+    * `reset_to_defaults()`
+    * `async_handler(sigs, callback)`
+    * `get_signal_setting(sig)`
+    * `has_sig(sig_id)`.
 * **Context Managers**:
-    * `temp_handler`, `with_timeout`, `block_signals`.
+    * `temp_handler(sigs, reaction)`: temporarily seting a handler, restoring the old one on exit
+            `sigs`:     a signal number, a `Signals` object, or a list/tuple consisting of them (you may mix numbers and `Signal` objs)
+            `reaction`: a `SigReaction` object or `callable` object (a callback), it defines how to treat `sigs`
+    * `with_timeout(seconds)`: context manager to run a block of code with a timeout (UNIX-only)
+            `seconds`:  timeout to wait until SIGALRM will be sent
+    * `block_signals(isigs)`: context manager to temporarily block signals from being delivered (UNIX-only); they are going to be delivered after the leaving the covered block of code
+            `sigs`:     a signal number, a `Signals` object, or a list/tuple consisting of them (you may mix numbers and `Signal` objs)
 
 For detailed information on each function's parameters, please refer to the docstrings within the source code.
-
-## Testing
-To run the test suite, install the development dependencies and run `pytest`:
-```bash
-pip install -e ".[dev]"  # Assuming dev dependencies are in pyproject.toml
-pytest
-```
 
 ## License
 This project is licensed under the MIT License. See the `LICENSE` file for details.
