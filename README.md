@@ -184,7 +184,7 @@ The library exposes both a class-based and a functional API.
         * `has_sig(sig_id)`: checks if a signal exists on the current system by its name or number, returns True or False
             * `sig_id`:    a signal number or signal name (like 'SIGTERM'). If another type is provided, `sig_id` will be converted to str first
     * `SimSigTimeoutError(message)`: custom **exception** for timeouts
-            * `message`:   (optional) a custom message to store inside the exception object, the defaul is `'SIGALRM'` (so for \*NIX systems `has_sig(SimSigTimeoutError())==True`)
+            * `message`:   (optional) a custom message to store inside the exception object, the defaul is `'SIGALRM'` (so for UNIX systems `has_sig(SimSigTimeoutError())==True`)
 * **Context Managers**:
     * `temp_handler(sigs, reaction)`: temporarily seting a handler, restoring the old one on exit
             * `sigs`:     a signal number, a `Signals` object, or a list/tuple consisting of them (you may mix numbers and `Signal` objs)
